@@ -30,18 +30,20 @@
                 shift-number show-font smart-newline spacious-padding
                 spdx standard-themes string-inflection substitute
                 systemd tempel tmr transpose-frame treesit-auto
-                treesit-fold typo undo-fu-session uuidgen vc-jj verb
-                vertico vundo web-mode wgrep yaml-pro yasnippet
-                yuck-mode))
+                treesit-fold typo typst-preview typst-ts-mode
+                undo-fu-session uuidgen vc-jj verb vertico vundo
+                web-mode websocket wgrep yaml-pro yasnippet yuck-mode))
  '(package-vc-selected-packages
-   '((kdl-ts-mode :url "https://github.com/merrickluo/kdl-ts-mode")
+   '((typst-preview :url "https://github.com/havarddj/typst-preview.el")
+     (kdl-ts-mode :url "https://github.com/merrickluo/kdl-ts-mode")
      (kbd-mode :url "https://github.com/kmonad/kbd-mode")
      (auto-tangle-mode :url
                        "https://github.com/progfolio/auto-tangle-mode.el")
      (combobulate :url "https://github.com/mickeynp/combobulate")))
  '(safe-local-variable-values
-   '((just-indent-offset . 4) (just-ts-indent-offset . 4)
-     (just-ts-indent-offset . 2) (apheleia-formatter . nixfmt))))
+   '((typst-ts-indent-offset . 2) (just-indent-offset . 4)
+     (just-ts-indent-offset . 4) (just-ts-indent-offset . 2)
+     (apheleia-formatter . nixfmt))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

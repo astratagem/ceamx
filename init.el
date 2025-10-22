@@ -1541,6 +1541,27 @@ PROPS is as in `editorconfig-after-apply-functions'."
 ;; This is an optional dependency for editing source code blocks.
 (setup (:package edit-indirect))
 
+;;;;; Typst
+
+(setup (:package typst-ts-mode)
+  (:with-feature ceamx-eglot
+    (require 'ceamx-eglot)
+    (cl-pushnew '("typst-tinymist") ceamx-eglot-server-configurations-alist)
+    (:with-feature eglot
+      (:when-loaded
+        (cl-pushnew `(typst-ts-mode . ,(ceamx-eglot-server-contact "typst-tinymist"))
+                    eglot-server-programs)))))
+
+;; These are undeclared dependencies of `typst-preview':
+(setup (:package f))
+(setup (:package websocket))
+
+(setup (:package (typst-preview :url "https://github.com/havarddj/typst-preview.el"))
+  (setq! typst-preview-browser "default")
+  (:bind "C-c C-j" #'typst-preview-send-position)
+  (:with-feature typst-ts-mode
+    (setq! typst-ts-watch-options "--open")))
+
 ;;;; Outline
 
 (setup outline
