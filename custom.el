@@ -19,20 +19,21 @@
                 golden-ratio gptel help-find helpful hl-todo htmlize
                 ialign indent-bars jinx jq-mode just-mode just-ts-mode
                 kbd-mode kdl-ts-mode keycast keymap-utils kind-icon
-                ligature lin lispy macrostep magit marginalia mastodon
-                minions mlscroll modus-themes morlock mugur mwim
-                neon-mode nerd-icons-completion nerd-icons-dired
-                nix-ts-mode no-littering notmuch-indicator olivetti
-                orderless org-appear org-download org-modern org-node
-                org-remark org-sidebar org-web-tools outli ox-gfm
-                page-break-lines pandoc-mode pdf-tools popper pulsar
-                puni rainbow-mode reformatter rustic savefold setup
-                shift-number show-font smart-newline spacious-padding
-                spdx standard-themes string-inflection substitute
-                systemd tempel tmr transpose-frame treesit-auto
-                treesit-fold typo typst-preview typst-ts-mode
-                undo-fu-session uuidgen vc-jj verb vertico vundo
-                web-mode websocket wgrep yaml-pro yasnippet yuck-mode))
+                languagetool ligature lin lispy macrostep magit
+                marginalia mastodon minions mlscroll modus-themes
+                morlock mugur mwim neon-mode nerd-icons-completion
+                nerd-icons-dired nix-ts-mode no-littering
+                notmuch-indicator olivetti orderless org-appear
+                org-download org-modern org-node org-remark org-sidebar
+                org-web-tools outli ox-gfm page-break-lines pandoc-mode
+                pdf-tools popper pulsar puni rainbow-mode reformatter
+                rustic savefold setup shift-number show-font
+                smart-newline spacious-padding spdx standard-themes
+                string-inflection substitute systemd tempel tmr
+                transpose-frame treesit-auto treesit-fold typo
+                typst-preview typst-ts-mode undo-fu-session uuidgen
+                vc-jj verb vertico vundo web-mode websocket wgrep
+                yaml-pro yasnippet yuck-mode))
  '(package-vc-selected-packages
    '((typst-preview :url "https://github.com/havarddj/typst-preview.el")
      (kdl-ts-mode :url "https://github.com/merrickluo/kdl-ts-mode")
@@ -41,7 +42,9 @@
                        "https://github.com/progfolio/auto-tangle-mode.el")
      (combobulate :url "https://github.com/mickeynp/combobulate")))
  '(safe-local-variable-values
-   '((typst-ts-indent-offset . 2) (just-indent-offset . 4)
+   '((eval add-hook 'after-save-hook #'org-gfm-export-to-markdown t t)
+     (jq-indent-offset . 2) (just-indent-offset . 2)
+     (typst-ts-indent-offset . 2) (just-indent-offset . 4)
      (just-ts-indent-offset . 4) (just-ts-indent-offset . 2)
      (apheleia-formatter . nixfmt))))
 (custom-set-faces

@@ -1562,6 +1562,25 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (:with-feature typst-ts-mode
     (setq! typst-ts-watch-options "--open")))
 
+;;;;; LanguageTool
+
+(setup (:package languagetool)
+  (setq! languagetool-java-arguments '("-Dfile.encoding=UTF-8")))
+
+;;;;; Harper
+
+(setup harper
+  (:with-feature ceamx-eglot
+    (require 'ceamx-eglot)
+    (cl-pushnew '("text-harper-ls" . '(:linters ( :SpellCheck :json-false
+                                                  :SentenceCapitalization :json-false)))
+                ceamx-eglot-server-configurations-alist)
+    (:with-feature eglot
+      (:when-loaded
+        (cl-pushnew (cons '(markdown-mode org-mode typst-ts-mode)
+                          (ceamx-eglot-server-contact "text-harper-ls"))
+                    eglot-server-programs)))))
+
 ;;;; Outline
 
 (setup outline
