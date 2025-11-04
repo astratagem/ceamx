@@ -1001,8 +1001,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (electric-indent-mode 1)
   (electric-layout-mode 1))
 
-(setup (:package aggressive-indent)
-  (global-aggressive-indent-mode 1))
+(setup (:package aggressive-indent))
 
 ;;;; Search
 
