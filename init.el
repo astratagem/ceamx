@@ -2174,15 +2174,15 @@ PROPS is as in `editorconfig-after-apply-functions'."
 
 ;;;;; Just
 
-(setup (:package just-ts-mode)
-  (:file-match "\\.just\\'")
+(setup (:package just-mode)
+  (:match-file "\\.just\\'")
   (:with-feature ceamx-eglot
     (:when-loaded
       (cl-pushnew '("just-just-lsp" . nil)
                   ceamx-eglot-server-configurations-alist)
       (:with-feature eglot
         (:when-loaded
-          (cl-pushnew `(just-ts-mode . ,(ceamx-eglot-server-contact "just-just-lsp"))
+          (cl-pushnew `(just-mode . ,(ceamx-eglot-server-contact "just-just-lsp"))
                       eglot-server-programs))))))
 
 ;;;;; Dotenv
