@@ -2858,6 +2858,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   "c s" #'string-inflection-toggle
   "c +" #'shift-number-up
   "c -" #'shift-number-down
+  "h" nil                               ; RESERVED: for "hints"
   "i" nil                                 ; RESERVED: for "images"
   "f" #'flycheck-mode
   "k" #'keycast-mode-line-mode
@@ -2879,6 +2880,10 @@ PROPS is as in `editorconfig-after-apply-functions'."
 (setup dired-preview
   (:with-feature dired
     (:bind "C-c t p" #'dired-preview-global-mode)))
+
+(setup eglot
+  (:when-loaded
+    (:bind "C-c t h" #'eglot-inlay-hints-mode)))
 
 (setup org-modern
   (:with-feature org
