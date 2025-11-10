@@ -21,7 +21,7 @@ schemastore-catalog-url := 'https://raw.githubusercontent.com/SchemaStore/schema
 schemastore-catalog-file := prj-root / "data/json-schema/catalog.json"
 
 push:
-    for remote in origin github; do jj git push -b main $remote; done
+    for remote in origin github; do jj git push -b main --remote $remote; done
 
 ###: EMACS =====================================================================
 
