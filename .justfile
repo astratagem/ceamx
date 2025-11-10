@@ -20,6 +20,9 @@ prj-data := env_var('PRJ_DATA_HOME')
 schemastore-catalog-url := 'https://raw.githubusercontent.com/SchemaStore/schemastore/refs/heads/master/src/api/json/catalog.json'
 schemastore-catalog-file := prj-root / "data/json-schema/catalog.json"
 
+push:
+    for remote in origin github; do jj git push -b main $remote; done
+
 ###: EMACS =====================================================================
 
 # <- Evaluate elisp via `emacsclient`
