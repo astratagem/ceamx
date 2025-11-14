@@ -2184,7 +2184,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 ;;;;; Just
 
 (setup (:package just-mode)
-  (:match-file "\\.just\\'")
+  (:match-file "*.just")
   (:with-feature ceamx-eglot
     (:when-loaded
       (cl-pushnew '("just-just-lsp" . nil)
