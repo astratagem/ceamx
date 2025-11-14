@@ -1526,7 +1526,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (:with-mode global-jinx-mode
     (:hook-into after-init-hook))
   (setq! jinx-languages "en")
-  (setq! global-jinx-modes `(text-mode (not ,@ceamx-text-mode-derived-prog-modes))))
+  (setq! global-jinx-modes `(markdown-mode markdown-ts-mode org-mode)))
 
 ;;;;; Markdown
 
