@@ -42,7 +42,9 @@
                        "https://github.com/progfolio/auto-tangle-mode.el")
      (combobulate :url "https://github.com/mickeynp/combobulate")))
  '(safe-local-variable-values
-   '((rustic-indent-offset . 4) (apheleia-formatter . alejandra)
+   '((web-mode-indent-style . 2) (web-mode-block-padding . 2)
+     (web-mode-script-padding . 2) (web-mode-style-padding . 2)
+     (rustic-indent-offset . 4) (apheleia-formatter . alejandra)
      (eval add-hook 'after-save-hook #'org-gfm-export-to-markdown t t)
      (jq-indent-offset . 2) (just-indent-offset . 2)
      (typst-ts-indent-offset . 2) (just-indent-offset . 4)
