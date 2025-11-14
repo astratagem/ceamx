@@ -240,6 +240,16 @@
     (cl-pushnew (recentf-expand-file-name no-littering-var-directory) recentf-exclude)
     (cl-pushnew (recentf-expand-file-name no-littering-etc-directory) recentf-exclude)))
 
+;;;;; Compatibility with Nix-installed packages
+
+(defun ceamx-package-delete-skip-system-a (orig-fn pkg-desc &rest args)
+  "Skip deleting system packages, allow deleting user packages normally."
+  (if (and pkg-desc
+           (file-in-directory-p (package-desc-dir pkg-desc) "/nix/store"))
+      (message "Skipping deletion of system package: %s" (package-desc-name pkg-desc))
+    (funcall orig-fn pkg-desc args)))
+(advice-add 'package-delete :around #'ceamx-package-delete-skip-system-a)
+
 
 ;;;;; setup.el
 
