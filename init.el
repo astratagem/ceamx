@@ -588,6 +588,29 @@
 	    :blink-cursor-interval 0.4
 	    :blink-cursor-delay 0.2))))
 
+;;;;; Sideline
+
+(setup (:package sideline)
+  (setq! sideline-backends-right '(sideline-eglot))
+  (setq! sideline-backends-left-skip-current-line t
+         sideline-backends-right-skip-current-line t)
+  (setq! sideline-order-left 'down
+         sideline-order-right 'up)
+  (setq! sideline-format-left "%s   "
+         sideline-format-right "   %s")
+  (setq! sideline-priority 100)
+  (setq! sideline-display-backend-name t))
+
+(setup (:package sideline-flymake)
+  (:with-feature flymake
+    (:hook sideline-mode)))
+
+(setup (:package sideline-flycheck)
+  (:with-feature flycheck
+    (:hook sideline-mode sideline-flycheck-setup)))
+
+(setup (:package sideline-eglot))
+
 ;;;;; Images
 
 (setup image-mode
@@ -2881,6 +2904,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   "f" #'flycheck-mode
   "k" #'keycast-mode-line-mode
   "l" #'display-line-numbers-mode
+  "L" #'sideline-mode
   "M" #'menu-bar-mode
   "o" #'outline-minor-mode
   "p" nil                               ; RESERVED: for "previews"

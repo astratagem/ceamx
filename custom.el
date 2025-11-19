@@ -21,7 +21,8 @@
                 orderless org-appear org-download org-modern org-remark
                 org-sidebar org-web-tools outli ox-gfm page-break-lines
                 pdf-tools popper pulsar puni rainbow-mode reformatter
-                rustic savefold setup shift-number show-font
+                rustic savefold setup shift-number show-font sideline
+                sideline-eglot sideline-flycheck sideline-flymake
                 smart-newline spacious-padding substitute systemd tmr
                 transpose-frame treesit-auto treesit-fold typo
                 typst-preview typst-ts-mode undo-fu-session uuidgen
