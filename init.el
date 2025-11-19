@@ -2111,6 +2111,14 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (:hook (defun ceamx+rustic-disable-flymake-h ()
            (flymake-mode -1))))
 
+(setup reformatter
+  (:when-loaded
+    (reformatter-define rustfmt
+      :group 'ceamx
+      :program "rustfmt")
+    (:with-mode rustfmt-on-save-mode
+      (:hook-into rust-ts-mode-hook))))
+
 ;;;;; Lua
 
 (setup lua-mode
