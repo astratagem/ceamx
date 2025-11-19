@@ -12,7 +12,11 @@
                        "https://github.com/progfolio/auto-tangle-mode.el")
      (combobulate :url "https://github.com/mickeynp/combobulate")))
  '(safe-local-variable-values
-   '((apheleia-formatter . alejandra) (just-indent-offset . 2)
+   '((jinx-dir-local-words . "configurated")
+     (org-refile-targets (nil :maxlevel . 6))
+     (eval load-file "./ceamx-dev-loader.el")
+     (org-archive-location . "graveyard/%s.archive::datetree/")
+     (apheleia-formatter . alejandra) (just-indent-offset . 2)
      (apheleia-formatter . nixfmt))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

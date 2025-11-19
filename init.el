@@ -203,35 +203,62 @@
 (define-prefix-command 'ceamx-web-prefix)
 (define-prefix-command 'ceamx-workspace-prefix)
 
+;;;; Run custom init hooks on `elpaca-after-init-hook'
+
+(progn
+  (add-hook 'elpaca-after-init-hook #'ceamx-after-init-hook)
+  (add-hook 'elpaca-after-init-hook #'ceamx-emacs-startup-hook))
 
 ;;;; Packages Setup
 
-(require 'package)
+(defvar elpaca-directory (expand-file-name "elpaca/" ceamx-packages-dir))
 
-(setq package-user-dir ceamx-packages-dir)
-(setq package-native-compile t)
-;; Too flaky.  As long as package archives use HTTPS, no worries.
-(setq package-check-signature nil)
-
-(push '("melpa" . "https://melpa.org/packages/") package-archives)
-;; Official MELPA Mirror, in case necessary.
-;; (push '("melpa-mirror" . "https://www.mirrorservice.org/sites/melpa.org/packages/")
-;;       package-archives)
-
-(package-initialize)
-
-(let ((package-check-signature nil))
-  (unless (package-installed-p 'gnu-elpa-keyring-update)
-    (package-install 'gnu-elpa-keyring-update)))
+(defvar elpaca-installer-version 0.11)
+;; (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil :depth 1 :inherit ignore
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (<= emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                  ,@(when-let* ((depth (plist-get order :depth)))
+                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                  ,(plist-get order :repo) ,repo))))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
 (progn
   ;; These must be set before the package loads.
   (eval-and-compile
     (setq no-littering-etc-directory ceamx-storage-dir
           no-littering-var-directory ceamx-cache-dir))
-  (unless (package-installed-p 'no-littering)
-    (package-install 'no-littering))
-  (require 'no-littering)
+  (elpaca no-littering
+    (require 'no-littering))
   (setq history-file (expand-file-name "history" ceamx-cache-dir))
   (setq recentf-save-file (expand-file-name "recentf" ceamx-cache-dir))
   (setq bookmark-default-file (expand-file-name "bookmarks" ceamx-cache-dir))
@@ -240,32 +267,53 @@
     (cl-pushnew (recentf-expand-file-name no-littering-var-directory) recentf-exclude)
     (cl-pushnew (recentf-expand-file-name no-littering-etc-directory) recentf-exclude)))
 
-;;;;; Compatibility with Nix-installed packages
-
-(defun ceamx-package-delete-skip-system-a (orig-fn pkg-desc &rest args)
-  "Skip deleting system packages, allow deleting user packages normally."
-  (if (and pkg-desc
-           (file-in-directory-p (package-desc-dir pkg-desc) "/nix/store"))
-      (message "Skipping deletion of system package: %s" (package-desc-name pkg-desc))
-    (funcall orig-fn pkg-desc args)))
-(advice-add 'package-delete :around #'ceamx-package-delete-skip-system-a)
-
 
 ;;;;; setup.el
 
 ;; <https://www.emacswiki.org/emacs/SetupEl>
 (progn
-  (unless (package-installed-p 'setup)
-    (package-vc-install '(setup . (:url "https://codeberg.org/pkal/setup.el"))))
-  (require 'setup)
+  (elpaca (setup :host codeberg :repo "pkal/setup.el")
+          (require 'setup)
 
-  (setup-define :load-after
-    (lambda (&rest features)
-      (let ((body `(require ',(setup-get 'feature))))
-        (dolist (feature (nreverse features))
-          (setq body `(with-eval-after-load ',feature ,body)))
-        body))
-    :documentation "Load the current feature after FEATURES."))
+          (setup-define :load-after
+            (lambda (&rest features)
+              (let ((body `(require ',(setup-get 'feature))))
+                (dolist (feature (nreverse features))
+                  (setq body `(with-eval-after-load ',feature ,body)))
+                body))
+            :documentation "Load the current feature after FEATURES.")
+
+;;;;;; Add Elpaca support to setup.el via `:package'
+
+          (defun ceamx+setup--elpaca-package-wrapper (body _name)
+            "Wrap BODY in an `elpaca' block if necessary.
+BODY is wrapped in an `elpaca' block if `setup-attributes' contains an
+alist with the key `:package'.  Note that this overrides the default
+integration with the builtin package manager, as one would never use it
+alongside `elpaca'."
+            (if (assq 'package setup-attributes)
+                `(elpaca ,(cdr (assq 'package setup-attributes))
+                         ,@(macroexp-unprogn body))
+              body))
+
+          (cl-pushnew #'ceamx+setup--elpaca-package-wrapper setup-modifier-list)
+
+          ;; Override the original handler definition for `:package'.
+          (setup-define :package
+            (lambda (order &rest recipe)
+              (push (cond
+                     ((eq order t) `(package . ,(setup-get 'feature)))
+                     ((eq order nil) `(package . nil))
+                     (t `(package . ,order)))
+                    setup-attributes)
+              nil)
+            :documentation "Install ORDER with `elpaca'.
+ORDER can be used to deduce the feature context."
+            :shorthand (lambda (args)
+                         (let ((arg (cadr args)))
+                           (if (listp arg)
+                               (car arg)
+                             arg))))))
 
 ;; Override the builtin ":hook" macro to accept priority.
 ;; FIXME: "ensure" spec causes error...
@@ -276,17 +324,21 @@
 ;;   :ensure '(func nil)
 ;;   :repeatable t)
 
+(elpaca-wait)
+
+
 ;;;;; Install the latest version of Org-Mode
 
-(unless after-init-time
-  (when (and (featurep 'org)
-             (package--active-built-in-p 'org))
-    (package-upgrade 'org)))
+(setup org
+  (unless after-init-time
+    (when (featurep 'org)
+      (unload-feature 'org)))
+  (elpaca org))
 
 
 ;;;; Libraries
 
-(setup transient
+(setup (:package transient)
   (:when-loaded
     (:with-map transient-map
       (:bind "<escape>" #'transient-quit-one))))
@@ -498,7 +550,6 @@
 ;;;;; Layout
 
 (setup (:package spacious-padding)
-  (:hook-into after-init-hook)
   (setq! spacious-padding-widths
          '( :internal-border-width 4
             :header-line-width 2
@@ -508,7 +559,8 @@
             :scroll-bar-width 6
             :left-fringe-width 2
             :right-fringe-width 2))
-  (setq! spacious-padding-subtle-frame-lines nil))
+  (setq! spacious-padding-subtle-frame-lines nil)
+  (spacious-padding-mode))
 
 
 ;;;;; Decorations
@@ -518,8 +570,7 @@
   (setq! nerd-icons-font-family "Symbols Nerd Font Mono"))
 
 (setup (:package page-break-lines)
-  (:with-hook after-init-hook
-    (:hook #'global-page-break-lines-mode)))
+  (global-page-break-lines-mode))
 
 (setup (:package svg-lib)
   (:when-loaded
@@ -537,14 +588,13 @@
   (setq! hl-line-sticky-flag nil))
 
 (setup (:package lin)
-  (:with-hook after-init-hook
-    (:hook #'lin-global-mode)))
+  (lin-global-mode))
 
 (setup (:package pulsar)
-  (:with-hook after-init-hook
-    (:hook #'pulsar-global-mode))
   (:with-hook minibuffer-setup-hook
     (:hook #'pulsar-pulse-line))
+
+  (pulsar-global-mode)
 
   (setq! pulsar-pulse t
 	 pulsar-delay 0.055
@@ -569,10 +619,6 @@
 
 (setup (:package cursory)
   (require 'cursory)
-  (add-hook 'after-init-hook
-	    (defun ceamx-enable-cursory-mode ()
-	      (cursory-mode 1)
-	      (cursory-set-preset (or (cursory-restore-latest-preset) 'box))))
   (setq! cursory-latest-state-file (expand-file-name "cursory-latest-state.eld" ceamx-storage-dir))
   (setq! cursory-presets
 	 '((box
@@ -586,7 +632,9 @@
 	    :blink-cursor-mode 1
 	    :blink-cursor-blinks 33
 	    :blink-cursor-interval 0.4
-	    :blink-cursor-delay 0.2))))
+	    :blink-cursor-delay 0.2)))
+  (cursory-mode 1)
+  (cursory-set-preset (or (cursory-restore-latest-preset) 'box)))
 
 ;;;;; Sideline
 
@@ -643,7 +691,7 @@
          Man-notify-method 'aggressive))
 
 (setup winner
-  (:hook-into after-init-hook))
+  (winner-mode))
 
 ;;;;; Scrolling
 
@@ -734,8 +782,8 @@
 ;;;;; Window management
 
 (setup (:package golden-ratio)
-  (:hook-into after-init-hook)
-  (setq! golden-ratio-auto-scale t))
+  (setq! golden-ratio-auto-scale t)
+  (golden-ratio-mode))
 
 (setup (:package ace-window)
   (setq! aw-scope 'visible)
@@ -801,16 +849,16 @@
   (column-number-mode 1))
 
 (setup (:package mlscroll)
-  (:hook-into after-init-hook))
+  (mlscroll-mode 1))
 
 (setup (:package minions)
-  (:hook-into after-init-hook))
+  (minions-mode 1))
 
 
 ;;;; Header Line
 
 (setup (:package breadcrumb)
-  (:hook-into after-init-hook))
+  (breadcrumb-mode 1))
 
 
 ;;;; Help
@@ -855,7 +903,7 @@
       (advice-add #'helpful-update :after #'elisp-demos-advice-helpful-update))))
 
 (setup (:package devdocs)
-  (:with-hook after-init-hook
+  (:with-hook elpaca-after-init-hook
     (:hook #'devdocs-update-all))
   (:with-feature popper
     (:when-loaded
@@ -966,8 +1014,6 @@
 (setup (:package drag-stuff))
 
 (setup (:package editorconfig)
-  (:with-hook after-init-hook
-    (:hook #'editorconfig-mode))
   (:with-hook editorconfig-after-apply-functions
     (:hook
      ;; via <https://github.com/doomemacs/doomemacs/commit/43870bf8318f6471c4ce5e14565c9f0a3fb6e368>
@@ -981,7 +1027,8 @@ PROPS is as in `editorconfig-after-apply-functions'."
                   (derived-mode-p 'org-mode))
          (setq tab-width 8)))))
   ;; This is super important! Yikes...
-  (setq! editorconfig-lisp-use-default-indent t))
+  (setq! editorconfig-lisp-use-default-indent t)
+  (editorconfig-mode 1))
 
 (setup (:package ialign))
 
@@ -1129,8 +1176,6 @@ PROPS is as in `editorconfig-after-apply-functions'."
          diff-font-lock-syntax 'hunk-also))
 
 (setup (:package diff-hl)
-  (:with-mode global-diff-hl-mode
-    (:hook-into after-init-hook))
   (if (display-graphic-p)
       (diff-hl-show-hunk-mouse-mode 1)
     (diff-hl-margin-mode 1))
@@ -1140,7 +1185,8 @@ PROPS is as in `editorconfig-after-apply-functions'."
     (:with-hook magit-post-refresh-hook
       (:hook #'diff-hl-magit-post-refresh)))
   (:with-feature dired
-    (:hook #'diff-hl-dired-mode)))
+    (:hook #'diff-hl-dired-mode))
+  (global-diff-hl-mode 1))
 
 ;;;;; Git
 
@@ -1163,7 +1209,9 @@ PROPS is as in `editorconfig-after-apply-functions'."
 
 (setup (:package git-timemachine))
 
-(setup (:package magit)
+(setup (:package (git-commit :host github :repo "magit/magit" :files ("lisp/git-commit.el"))))
+
+(setup (:package (magit :wait t))
   (magit-wip-mode 1)
   (setq! magit-diff-refine-hunk t)
   (setq! magit-save-repository-buffers nil)
@@ -1240,9 +1288,8 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (setq! wdired-allow-to-change-permissions t))
 
 (setup (:package dired-preview)
-  (:with-mode dired-preview-global-mode
-    (:hook-into after-init-hook))
-  (setq! dired-preview-kill-buffers-method '(buffer-number . 5)))
+  (setq! dired-preview-kill-buffers-method '(buffer-number . 5))
+  (dired-preview-global-mode 1))
 
 (setup (:package dired-subtree)
   (:with-feature dired
@@ -1254,10 +1301,9 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (setq! dired-subtree-use-backgrounds nil))
 
 (setup (:package diredfl)
-  (:with-mode diredfl-global-mode
-    (:hook-into after-init-hook))
   (:when-loaded
-    (set-face-attribute 'diredfl-dir-name nil :bold t)))
+    (set-face-attribute 'diredfl-dir-name nil :bold t))
+  (diredfl-global-mode 1))
 
 (setup (:package nerd-icons-dired)
   (:hook-into dired-mode-hook))
@@ -1318,7 +1364,6 @@ PROPS is as in `editorconfig-after-apply-functions'."
    :preview-key '(:debounce 0.4 any)))
 
 (setup (:package vertico)
-  (:hook-into after-init-hook)
   (:with-hook rfn-eshadow-update-overlay-hook
     (:hook #'vertico-directory-tidy))
   (:with-feature savehist
@@ -1330,6 +1375,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (:with-feature vertico-multiform
     (:with-map vertico-multiform-map
       (:bind "C-l" #'vertico-multiform-vertical))
+    (vertico-mode 1)
     (setq! vertico-multiform-commands
            `((consult-line buffer)
              (consult-imenu buffer)
@@ -1380,10 +1426,10 @@ PROPS is as in `editorconfig-after-apply-functions'."
     (setq! savehist-save-minibuffer-history t)))
 
 (setup (:package marginalia)
-  (:hook-into after-init-hook)
   (:with-feature minibuffer
     (:with-map minibuffer-local-map
       (:bind "M-a" #'marginalia-cycle)))
+  (marginalia-mode 1)
   (setq! marginalia-align 'right))
 
 (setup (:package nerd-icons-completion)
@@ -1398,8 +1444,6 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (setq! tab-always-indent 'complete))
 
 (setup (:package corfu)
-  (:with-hook after-init-hook
-    (:hook #'global-corfu-mode))
   (:with-feature savehist
     (:when-loaded
       (corfu-history-mode 1)
@@ -1412,6 +1456,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
              (not (or (bound-and-true-p mct--active)
                       (bound-and-true-p vertico--input)
                       (eq (current-local-map) read-passwd-map))))))
+  (global-corfu-mode 1)
   (setq! corfu-preview-current t)
   (setq! corfu-popupinfo-delay '(0.7 . 0.5))
   (setq! corfu-cycle t)
@@ -1480,9 +1525,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 
 ;;;;; Embark
 
-(setup (:package embark embark-consult)
-  (:with-hook embark-collect-mode-hook
-    (:hook #'consult-preview-at-point-mode))
+(setup (:package embark)
   (:with-feature emacs
     (setq! prefix-help-command #'embark-prefix-help-command))
   (:with-feature vertico
@@ -1498,6 +1541,11 @@ PROPS is as in `editorconfig-after-apply-functions'."
      nil
      (window-parameters (mode-line-format . none)))
    display-buffer-alist))
+
+(setup (:package embark-consult)
+  (:with-feature embark
+    (:with-hook embark-collect-mode-hook
+      (:hook #'consult-preview-at-point-mode))))
 
 (setup embark
   (:with-feature wgrep
@@ -1556,8 +1604,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
     "<backtab>" #'tempel-previous))
 
 (setup (:package yasnippet)
-  (:with-hook after-init-hook
-    (:hook #'yas-global-mode))
+  (yas-global-mode 1)
   (setq! yas-snippet-dirs (list (file-name-concat ceamx-templates-dir "yasnippet")))
   (setq! yas-prompt-functions '( yas-completing-prompt
                                  yas-no-prompt))
@@ -1590,7 +1637,9 @@ PROPS is as in `editorconfig-after-apply-functions'."
 ;; Install with system package manager due to dependencies.
 (setup jinx
   (:with-mode global-jinx-mode
-    (:hook-into after-init-hook))
+    (:hook-into elpaca-after-init-hook))
+  (require 'jinx)
+  (global-jinx-mode 1)
   (setq! jinx-languages "en")
   (setq! global-jinx-modes `(markdown-mode markdown-ts-mode org-mode)))
 
@@ -1631,7 +1680,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 (setup (:package f))
 (setup (:package websocket))
 
-(setup (:package (typst-preview :url "https://github.com/havarddj/typst-preview.el"))
+(setup (:package (typst-preview :host github :repo "havarddj/typst-preview.el"))
   (setq! typst-preview-browser "default")
   (:bind "C-c C-j" #'typst-preview-send-position)
   (:with-feature typst-ts-mode
@@ -1690,7 +1739,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
-(setup (:package (combobulate :url "https://github.com/mickeynp/combobulate"))
+(setup (:package (combobulate :host github :repo "mickeynp/combobulate"))
   (:hook-into prog-mode-hook))
 
 
@@ -1703,7 +1752,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (global-treesit-fold-indicators-mode 1))
 
 (setup (:package savefold)
-  (:hook-into after-init-hook)
+  (savefold-mode 1)
   (setq! savefold-directory (file-name-concat ceamx-cache-dir "savefold"))
   (setq! savefold-backends '(hideshow outline))
   (:with-feature org
@@ -1929,7 +1978,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 
 ;;;;; Org-Mode: Tangle
 
-(setup (:package (auto-tangle-mode :url "https://github.com/progfolio/auto-tangle-mode.el"))
+(setup (:package (auto-tangle-mode :host github :repo "progfolio/auto-tangle-mode.el"))
   (:with-feature minions
     (:when-loaded
       (cl-pushnew #'auto-tangle-mode minions-prominent-modes))))
@@ -2002,8 +2051,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 ;;;;; Flycheck
 
 (setup (:package flycheck)
-  (:with-mode global-flycheck-mode
-    (:hook-into after-init-hook))
+  (global-flycheck-mode 1)
   (setq! flycheck-emacs-lisp-load-path 'inherit)
   (setq! flycheck-idle-change-delay 1.0)
   (setq! flycheck-display-errors-delay 1.5)
@@ -2049,8 +2097,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (setq-default lisp-indent-offset nil))
 
 (setup ceamx-lisp
-  (:with-mode ceamx-lisp-global-mode
-    (:hook-into after-init-hook)))
+  (ceamx-lisp-global-mode 1))
 
 (setup (:package lispy)
   (:bind "`" #'self-insert-command)
@@ -2082,7 +2129,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 (setup (:package macrostep))
 
 (setup (:package morlock)
-  (:hook-into after-init-hook))
+  (morlock-mode 1))
 
 (setup (:package keymap-utils))
 
@@ -2090,7 +2137,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 
 ;; This is for KMonad, not Kanata, but I've used it before and it's
 ;; close enough.
-(setup (:package (kbd-mode :url "https://github.com/kmonad/kbd-mode")))
+(setup (:package (kbd-mode :host github :repo "kmonad/kbd-mode")))
 
 ;; FIXME: unfortunately not working for me: https://github.com/chmouel/kanata-kbd-mode/issues/4
 ;;        other users seem to have unrelated issues with indentation as well.
@@ -2146,7 +2193,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 
 ;;;;; KDL
 
-(setup (:package (kdl-ts-mode :url "https://github.com/merrickluo/kdl-ts-mode"))
+(setup (:package (kdl-ts-mode :host github :repo "merrickluo/kdl-ts-mode"))
   (:file-match "\\.kdl\\'"))
 
 ;;;;; jq
@@ -2216,7 +2263,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
 (setup (:package web-mode)
   ;; Defer to ‘electric-pair-mode’.
   (setq! web-mode-enable-auto-pairing nil)
-  (when (package-installed-p 'prism)
+  (when (featurep 'prism)
     (setq! web-mode-enable-css-colorization nil))
   (setq! web-mode-enable-block-face t)
   (setq! web-mode-enable-part-face t)
@@ -2582,6 +2629,10 @@ PROPS is as in `editorconfig-after-apply-functions'."
   (:with-feature popper
     (:when-loaded
       (cl-pushnew "\\*eat\\*" popper-reference-buffers))))
+
+;;;; Packages: Finish existing queue
+
+(elpaca-wait)
 
 ;;;; Tools
 
@@ -3155,11 +3206,9 @@ PROPS is as in `editorconfig-after-apply-functions'."
 ;;;;; Start the daemon
 
 (setup emacs
-  (:with-hook after-init-hook
-    (:hook (defun ceamx-maybe-start-server-h ()
-             (require 'server)
-             (unless (server-running-p)
-               (server-start))))))
+  (require 'server)
+  (unless (server-running-p)
+    (server-start)))
 
 ;;;; Footer
 

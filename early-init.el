@@ -40,6 +40,14 @@
    (convert-standard-filename
     (expand-file-name "eln-cache/" ceamx-packages-dir))))
 
+(defvar ceamx-after-init-hook nil)
+(defun ceamx-after-init-hook ()
+  (run-hooks 'ceamx-after-init-hook))
+
+(defvar ceamx-emacs-startup-hook nil)
+(defun ceamx-emacs-startup-hook ()
+    (run-hooks 'ceamx-emacs-startup-hook))
+
 (setq native-comp-async-report-warnings-errors 'silent)
 (setq native-compile-prune-cache t)
 
