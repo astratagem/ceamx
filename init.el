@@ -2903,7 +2903,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   "i" nil                                 ; RESERVED: for "images"
   "f" #'flycheck-mode
   "k" #'keycast-mode-line-mode
-  "l" #'display-line-numbers-mode
+  "l" #'global-display-line-numbers-mode
   "L" #'sideline-mode
   "M" #'menu-bar-mode
   "o" #'outline-minor-mode
