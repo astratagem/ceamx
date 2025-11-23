@@ -1412,9 +1412,51 @@ PROPS is as in `editorconfig-after-apply-functions'."
                       (bound-and-true-p vertico--input)
                       (eq (current-local-map) read-passwd-map))))))
   (setq! corfu-preview-current t)
-  (setq! corfu-popupinfo-delay '(1.0 . 0.5))
+  (setq! corfu-popupinfo-delay '(0.7 . 0.5))
   (setq! corfu-cycle t)
-  (corfu-popupinfo-mode 1))
+  (setq! corfu-preselect 'first)
+  (corfu-popupinfo-mode 1)
+
+  ;; Insert the candidate when pressing one of these non-alphanumeric keys.
+  (dolist (char '("SPC" ":" "," "-" "." ";" "(" ")" "[" "]" "{" "}"))
+    (keymap-set corfu-map char (lambda ()
+                                 (interactive)
+                                 (corfu-insert)
+                                 (insert (this-command-keys))))))
+
+;; Set up Corfu TAB-and-Go style completion.
+(setup corfu
+  (setq! corfu-cycle t
+         corfu-preselect 'prompt)
+  (:with-map corfu-map
+    (:bind "TAB" #'corfu-next
+           "<tab>" #'corfu-next
+           "S-TAB" #'corfu-previous
+           "<backtab>" #'corfu-previous)))
+
+;; Set up the samekey style completion for Corfu.
+;; https://github.com/minad/corfu/wiki#same-key-used-for-both-the-separator-and-the-insertion
+;; (setup corfu
+;;   (setq! corfu-separator ?\s)
+;;   (defun ceamx-corfu--samekey-insert ()
+;;     (interactive)
+;;     (if current-prefix-arg
+;;         ;; Assume the intent is to leave the word as is, so insert as
+;;         ;; is.
+;;         (progn
+;;           (corfu-quit)
+;;           (insert " ")))
+;;     (if (and (= (char-before) corfu-separator)
+;;              (or (not (char-after))
+;;                  (= (char-after) ?\s)
+;;                  (= (char-after) ?\n)))
+;;         (progn
+;;           (corfu-insert)
+;;           (insert " "))
+;;       (corfu-insert-separator)))
+;;   (:with-map corfu-map
+;;     #'ceamx-cor
+;;     (:bind " " #'ceamx-corfu--samekey-insert)))
 
 (setup (:package kind-icon)
   (:with-feature corfu
