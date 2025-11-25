@@ -652,6 +652,7 @@
   (setq! auto-hscroll-mode 'current-line)
   (setq! ;; scroll-error-top-bottom t
    ;; scroll-preserve-screen-position t
+   scroll-margin 2
    scroll-conservatively 10000))
 
 ;;;;; Display buffer
