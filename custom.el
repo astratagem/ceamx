@@ -12,7 +12,8 @@
                        "https://github.com/progfolio/auto-tangle-mode.el")
      (combobulate :url "https://github.com/mickeynp/combobulate")))
  '(safe-local-variable-values
-   '((jinx-dir-local-words . "configurated")
+   '((eval add-hook 'after-save-hook #'org-gfm-export-to-markdown t t)
+     (jinx-dir-local-words . "configurated")
      (org-refile-targets (nil :maxlevel . 6))
      (eval load-file "./ceamx-dev-loader.el")
      (org-archive-location . "graveyard/%s.archive::datetree/")
