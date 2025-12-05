@@ -2676,6 +2676,15 @@ PROPS is as in `editorconfig-after-apply-functions'."
            :stream t
            :key (## ceamx-auth/lookup "api.anthropic.com" "emacs-gptel"))))
 
+(setup (:package (monet :host github :repo "stevemolitor/monet")))
+
+(setup (:package (claude-code :host github :repo "stevemolitor/claude-code.el"))
+  (:with-feature monet
+    (:with-function monet-start-server-function
+      (:hook-into claude-code-process-environment-functions))
+    (monet-mode 1))
+  (claude-code-mode 1))
+
 ;;;; Capture
 
 (setup org-capture
