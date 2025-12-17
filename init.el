@@ -2667,7 +2667,12 @@ PROPS is as in `editorconfig-after-apply-functions'."
 
 ;;;; AI
 
-(require 'ceamx-ai)
+(setup ceamx-ai
+  (require 'ceamx-ai)
+
+  ;; FIXME: find a way to do this lazily
+  ;; (setenv "ANTHROPIC_API_KEY" (ceamx-auth/lookup "api.anthropic.com" "emacs-env-var"))
+  )
 
 (setup (:package gptel)
   (setq! gptel-model 'claude-sonnet-4-20250514)
@@ -2684,6 +2689,12 @@ PROPS is as in `editorconfig-after-apply-functions'."
       (:hook-into claude-code-process-environment-functions))
     (monet-mode 1))
   (claude-code-mode 1))
+
+;; Aider.el uses the "ANTHROPIC_API_KEY" environment variable for auth.
+(setup (:package aider)
+  (setq! aider-args '("--model" "sonnet" "--no-auto-accept-architect"))
+  (:with-feature magit
+    (aider-magit-setup-transients)))
 
 ;;;; Capture
 
