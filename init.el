@@ -447,7 +447,7 @@ ORDER can be used to deduce the feature context."
   (require 'doric-themes)
   (:with-feature ceamx-ui
     (:when-loaded
-      (ceamx-ui-define-preferred-themes 'doric 'doric-dark 'doric-light)
+      (ceamx-ui-define-preferred-themes 'doric 'doric-obsidian 'doric-light)
       (setq! doric-themes-to-toggle
              (ceamx-ui-theme-family-preferred-themes 'doric)))))
 
@@ -478,7 +478,8 @@ ORDER can be used to deduce the feature context."
 ;;;;;; Load the preferred theme
 
 (setup ceamx-ui
-  (setq! ceamx-ui-theme-family 'modus))
+  (setq! ceamx-ui-theme-family 'doric)
+  (ceamx-ui/load-dark-theme))
 
 ;;;;; Font
 
