@@ -24,6 +24,41 @@
 
 ;;; Code:
 
+;; via <https://github.com/minad/consult?tab=readme-ov-file#help>
+;;;###autoload
+(defun ceamx/emacs-info ()
+  "Search through common Emacs info pages."
+  (interactive)
+  (consult-info "emacs" "efaq" "elisp" "cl"))
+
+;;;###autoload
+(defun ceamx/org-info ()
+  "Search through the Org-Mode info page."
+  (interactive)
+  (consult-info "org"))
+
+;;;###autoload
+(defun ceamx/completion-info ()
+  "Search through completion info pages."
+  (interactive)
+  (consult-info "vertico" "consult" "marginalia" "orderless" "embark"
+                "corfu" "cape" "tempel"))
+
+;;;###autoload
+(defun ceamx/consult-info-dwim (&optional buffer)
+  "Search Info manuals appropriate to BUFFER's major-mode."
+  (interactive)
+  (with-current-buffer (or buffer (current-buffer))
+    (let* ((mode major-mode)
+           (fn (pcase mode
+                 ((pred (lambda (x) (memq x '(emacs-lisp-mode))))
+                  #'ceamx/emacs-info)
+                 ((pred (lambda (x) (memq x '(org-mode org-agenda-mode))))
+                  #'ceamx/org-info)
+                 (_ #'consult-info))))
+      (command-execute fn))))
+
+
 (defun ceamx/embark-export-write ()
   "Export the current `vertico' candidates to a writable buffer.
 Supported export flows include the following:

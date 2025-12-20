@@ -2777,10 +2777,10 @@ ORDER can be used to deduce the feature context."
   ;; "C-h F" #'apropos-function
   "C-h h" #'helpful-at-point
   "C-h i" (cons "[ INFO ]" #'ceamx-info-prefix)
-  ;; "C-h i i" #'ceamx/consult-info-dwim
-  ;; "C-h i c" #'ceamx/completion-info
-  ;; "C-h i e" #'ceamx/emacs-info
-  ;; "C-h i o" #'ceamx/org-info
+  "C-h i i" #'ceamx/consult-info-dwim
+  "C-h i c" #'ceamx/completion-info
+  "C-h i e" #'ceamx/emacs-info
+  "C-h i o" #'ceamx/org-info
   "C-h I" #'consult-info
   "C-h k" #'helpful-key
   "C-h K" (cons "[ KEYBINDS ]" #'ceamx-help-keybindings-prefix)
