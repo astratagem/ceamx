@@ -184,6 +184,7 @@
 (define-prefix-command 'ceamx-code-prefix)
 (define-prefix-command 'ceamx-completion-prefix)
 (define-prefix-command 'ceamx-cryption-prefix)
+(define-prefix-command 'ceamx-doing-prefix)
 (define-prefix-command 'ceamx-export-prefix)
 (define-prefix-command 'ceamx-file-prefix)
 (define-prefix-command 'ceamx-fold-prefix)
@@ -1805,16 +1806,6 @@ ORDER can be used to deduce the feature context."
 (setup org
   (setq! org-enforce-todo-dependencies t
          org-enforce-todo-checkbox-dependencies t)
-  (setq! org-todo-keywords
-         '((sequence
-            "TODO(t)"
-            "INPRG(i@/!)"
-            "BLOCKED(b@)"
-            "HOLD(h@)"
-            "PROJ(p)"
-            "|"
-            "DONE(d!)"
-            "CANCELLED(x@/!)")))
   (setq! org-clock-in-switch-to-state "INPRG"))
 
 ;;;;; Org-Mode: Logbook
@@ -2687,24 +2678,75 @@ ORDER can be used to deduce the feature context."
   (:with-feature magit
     (aider-magit-setup-transients)))
 
-;;;; Capture
+;;;; Doing
+
+(setup ceamx-doing
+  (require 'ceamx-doing))
+
+;;;;; Capture
 
 (setup org-capture
   (require 'org-capture)
   (setq! org-capture-templates
          (doct
+
           `(("Inbox item" :keys "i"
              :file ceamx-default-todo-file
              :headline "Inbox"
              :template ("* TODO %?"
                         "%i %a")
              :icon ("checklist" :set "octicon" :color "green"))
+
             ("Journal entry" :keys "j"
              :file denote-journal-path-to-new-or-existing-entry
              :template ("* %U %?" "%i" "%a")
              :kill-buffer t
              :empty-lines 1)))))
 
+
+;;;;; Org-GTD
+
+(setup (:package (org-gtd :host github
+                          :repo "Trevoke/org-gtd.el"
+                          :branch "org-gtd-4"))
+
+  (setq! org-gtd-directory (file-name-concat ceamx-notes-dir "org-gtd/"))
+
+  ;; This acknowledgement must be declared before the package loads.
+  (setq org-gtd-update-ack "4.0.0")
+
+  (setq! org-gtd-keyword-mapping '((todo . "TODO")
+                                   (next . "NEXT")
+                                   (wait . "WAIT")
+                                   ;; TODO: notify upstream that this
+                                   ;; required cell was not included in
+                                   ;; the setup example.
+                                   (done . "DONE")
+                                   (canceled . "CNCL")))
+  (:when-loaded
+    ;; REQUIRED for Org-GTD
+    (org-edna-mode 1))
+
+  (:with-feature org
+    (cl-pushnew org-gtd-directory org-agenda-files)
+    (setq! org-todo-keywords '((sequence
+                                "TODO(t)"
+                                "NEXT"
+                                "WAIT"
+                                "|"
+                                "DONE(d!)"
+                                "CNCL"))))
+
+  (:with-feature breadcrumb
+    ;; HACK: Possible workaround for random errors.
+    ;;
+    ;; > it looks like the above error might be a conflict between
+    ;; > breadcrumb-mode and the way [the developer is] using the
+    ;; > header-line-format.
+    ;;
+    ;; https://discordapp.com/channels/1071624232246706186/1451952177391210497/1451956630617849906
+    (:with-mode org-gtd-clarify-mode
+      (:hook (lambda () (breadcrumb-local-mode -1))))))
 
 ;;;; Keybindings
 
@@ -2798,7 +2840,7 @@ ORDER can be used to deduce the feature context."
   "C-c b" (cons "[ BUFFER    ]" #'ceamx-buffer-prefix)
   "C-c c" #'org-capture
   "C-c C" (cons "[ CAPTURE   ]" #'ceamx-capture-prefix)
-  ;; "C-c d"
+  "C-c d" (cons "[ DOING     ]" #'ceamx-doing-prefix)
   "C-c e" (cons "[ EDIT      ]" #'ceamx-structural-editing-prefix)
   "C-c f" (cons "[ FILE      ]" #'ceamx-file-prefix)
   "C-c g" #'magit-file-dispatch
@@ -2849,6 +2891,31 @@ ORDER can be used to deduce the feature context."
 (define-keymap :keymap ceamx-capture-prefix
   ;; TODO: <https://protesilaos.com/emacs/denote#text-h:eb72086e-05be-4ae3-af51-7616999fc7c9>
   "r" #'denote-region)
+
+;;;;; [C-c d] :: DOING
+
+(require 'ceamx-doing)
+
+(define-keymap :keymap ceamx-doing-prefix
+  "c" #'org-gtd-capture
+  "e" #'org-gtd-engage
+  "f" #'ceamx/focused-work
+  "p" #'org-gtd-process-inbox
+  "P" #'ceamx/active-projects
+  "q" #'ceamx/quick-wins
+  "n" #'org-gtd-show-all-next
+  "s" #'org-gtd-reflect-stuck-projects
+  "t" (cons "[ TRIAGE ]" (define-prefix-command 'ceamx-doing-t-prefix))
+  "t e" #'ceamx/triage-needs-effort
+  "t p" #'ceamx/triage-needs-priority)
+
+(setup org-gtd
+  (:when-loaded
+    (:with-mode org-gtd-clarify-mode
+      (:bind "C-c c" #'org-gtd-organize)))
+  (:with-feature org
+    (:with-mode org-agenda-mode
+      (:bind "C-c ." #'org-gtd-agenda-transient))))
 
 ;;;;; [C-c h] :: HISTORY
 
