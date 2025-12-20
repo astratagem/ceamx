@@ -2759,7 +2759,7 @@ PROPS is as in `editorconfig-after-apply-functions'."
   ;; "C-M-SPC" #'puni-mark-sexp-at-point
   ;; "C-M-@" #'easy-mark
   "C-M-#" #'consult-register
-  ;; "C-M-$" #'jinx-languages
+  "C-M-$" #'jinx-languages
 
   "C-S-d" #'crux-duplicate-current-line-or-region
   "C-M-S-d" #'crux-duplicate-and-comment-current-line-or-region
@@ -2989,27 +2989,20 @@ PROPS is as in `editorconfig-after-apply-functions'."
   "a l" #'ceamx-ui/light
   "a t" #'consult-theme
   "a o" #'olivetti-mode
-
   "p" (cons "[ PACKAGES ]" (define-prefix-command 'ceamx-session-p-prefix))
-  "p l" #'list-packages
-  "p r" #'package-reinstall
-  "p t" #'package-install
-  "p u" #'package-upgrade-all
-
   "q" #'save-buffers-kill-emacs
   "Q" #'kill-emacs
   "r" #'restart-emacs)
 
-;; FIXME: update for package.el
-;; (define-keymap :keymap ceamx-session-p-prefix
-;;   "f" #'elpaca-fetch-all
-;;   "F" #'elpaca-fetch
-;;   "i" #'elpaca-info
-;;   "m" #'elpaca-merge-all
-;;   "p" #'elpaca-pull
-;;   "r" #'+elpaca-reload-package
-;;   "t" #'elpaca-try
-;;   "u" #'elpaca-update)
+(define-keymap :keymap ceamx-session-p-prefix
+  "f" #'elpaca-fetch-all
+  "F" #'elpaca-fetch
+  "i" #'elpaca-info
+  "m" #'elpaca-merge-all
+  "p" #'elpaca-pull
+  "r" #'+elpaca-reload-package
+  "t" #'elpaca-try
+  "u" #'elpaca-update)
 
 ;;;;; [C-c t] :: TOGGLE
 
