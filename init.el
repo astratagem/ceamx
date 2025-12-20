@@ -513,7 +513,7 @@ ORDER can be used to deduce the feature context."
             :header-line-family "Berkeley Mono"
             :header-line-height 0.8
             :line-number-family "Berkeley Mono"
-            :line-number-height 0.8
+            :line-number-height 0.6
             :tab-bar-family "Berkeley Mono"
             :tab-bar-height 0.8
             :tab-line-family "Berkeley Mono"
