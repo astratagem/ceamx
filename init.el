@@ -2384,10 +2384,11 @@ PROPS is as in `editorconfig-after-apply-functions'."
            "dev"
            "philosophy"
            "correspondence"
-           "language"))
+           "language"
+           "quote"))
   (setq! denote-infer-keywords t
          denote-sort-keywords t)
-  (setq! denote-prompts '(title keywords))
+  (setq! denote-prompts '(title keywords file-type))
   (setq! denote-org-capture-specifiers "%l\n%i\n%?")
   (setq! denote-rename-confirmations '(modify-file-name
                                        rewrite-front-matter))
@@ -2414,6 +2415,8 @@ PROPS is as in `editorconfig-after-apply-functions'."
          (list denote-directory
                ceamx-diary-dir
                (expand-file-name "work" ceamx-notes-dir))))
+
+(setup (:package denote-markdown))
 
 ;;;; Presentation
 
