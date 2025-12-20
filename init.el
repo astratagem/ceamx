@@ -552,15 +552,20 @@ ORDER can be used to deduce the feature context."
 
 (setup (:package spacious-padding)
   (setq! spacious-padding-widths
-         '( :internal-border-width 4
-            :header-line-width 2
-            :mode-line-width 2
+         '( :internal-border-width 15
+            :header-line-width 4
+            :mode-line-width 6
             :tab-width 4
-            :right-divider-width 6
-            :scroll-bar-width 6
-            :left-fringe-width 2
-            :right-fringe-width 2))
-  (setq! spacious-padding-subtle-frame-lines nil)
+            :custom-button-width 3
+            :right-divider-width 30
+            :scroll-bar-width 8
+            :fringe-width 8))
+  ;; (setq! spacious-padding-subtle-frame-lines nil)
+  (setq! spacious-padding-subtle-frame-lines
+         '( :mode-line-active spacious-padding-line-active
+            :mode-line-inactive spacious-padding-line-inactive
+            :header-line-active spacious-padding-line-active
+            :header-line-inactive spacious-padding-line-inactive))
   (spacious-padding-mode))
 
 
