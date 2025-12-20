@@ -174,7 +174,7 @@
 (setq gnutls-min-prime-bits 3072)
 
 
-;;;; Keymaps
+;;;; Prefix Commands & Keymaps
 
 (define-prefix-command 'ceamx-activities-prefix)
 (define-prefix-command 'ceamx-appearance-prefix)
@@ -1211,6 +1211,8 @@ PROPS is as in `editorconfig-after-apply-functions'."
 (setup (:package git-timemachine))
 
 (setup (:package (git-commit :host github :repo "magit/magit" :files ("lisp/git-commit.el"))))
+
+;;;;; Magit
 
 (setup (:package (magit :wait t))
   (magit-wip-mode 1)
