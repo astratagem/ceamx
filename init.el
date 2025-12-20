@@ -273,47 +273,47 @@
 ;; <https://www.emacswiki.org/emacs/SetupEl>
 (progn
   (elpaca (setup :host codeberg :repo "pkal/setup.el")
-          (require 'setup)
+    (require 'setup)
 
-          (setup-define :load-after
-            (lambda (&rest features)
-              (let ((body `(require ',(setup-get 'feature))))
-                (dolist (feature (nreverse features))
-                  (setq body `(with-eval-after-load ',feature ,body)))
-                body))
-            :documentation "Load the current feature after FEATURES.")
+    (setup-define :load-after
+      (lambda (&rest features)
+        (let ((body `(require ',(setup-get 'feature))))
+          (dolist (feature (nreverse features))
+            (setq body `(with-eval-after-load ',feature ,body)))
+          body))
+      :documentation "Load the current feature after FEATURES.")
 
 ;;;;;; Add Elpaca support to setup.el via `:package'
 
-          (defun ceamx+setup--elpaca-package-wrapper (body _name)
-            "Wrap BODY in an `elpaca' block if necessary.
+    (defun ceamx+setup--elpaca-package-wrapper (body _name)
+      "Wrap BODY in an `elpaca' block if necessary.
 BODY is wrapped in an `elpaca' block if `setup-attributes' contains an
 alist with the key `:package'.  Note that this overrides the default
 integration with the builtin package manager, as one would never use it
 alongside `elpaca'."
-            (if (assq 'package setup-attributes)
-                `(elpaca ,(cdr (assq 'package setup-attributes))
-                         ,@(macroexp-unprogn body))
-              body))
+      (if (assq 'package setup-attributes)
+          `(elpaca ,(cdr (assq 'package setup-attributes))
+             ,@(macroexp-unprogn body))
+        body))
 
-          (cl-pushnew #'ceamx+setup--elpaca-package-wrapper setup-modifier-list)
+    (cl-pushnew #'ceamx+setup--elpaca-package-wrapper setup-modifier-list)
 
-          ;; Override the original handler definition for `:package'.
-          (setup-define :package
-            (lambda (order &rest recipe)
-              (push (cond
-                     ((eq order t) `(package . ,(setup-get 'feature)))
-                     ((eq order nil) `(package . nil))
-                     (t `(package . ,order)))
-                    setup-attributes)
-              nil)
-            :documentation "Install ORDER with `elpaca'.
+    ;; Override the original handler definition for `:package'.
+    (setup-define :package
+      (lambda (order &rest recipe)
+        (push (cond
+               ((eq order t) `(package . ,(setup-get 'feature)))
+               ((eq order nil) `(package . nil))
+               (t `(package . ,order)))
+              setup-attributes)
+        nil)
+      :documentation "Install ORDER with `elpaca'.
 ORDER can be used to deduce the feature context."
-            :shorthand (lambda (args)
-                         (let ((arg (cadr args)))
-                           (if (listp arg)
-                               (car arg)
-                             arg))))))
+      :shorthand (lambda (args)
+                   (let ((arg (cadr args)))
+                     (if (listp arg)
+                         (car arg)
+                       arg))))))
 
 ;; Override the builtin ":hook" macro to accept priority.
 ;; FIXME: "ensure" spec causes error...
@@ -492,20 +492,13 @@ ORDER can be used to deduce the feature context."
   (setq! fontaine-latest-state-file
          (expand-file-name "fontaine-latest-state.eld" ceamx-storage-dir))
   (setq! fontaine-presets
-         `((tiny
-	    :default-height 78)
-           (small
-	    :default-height 90)
-           (regular
-	    :default-height 102)
-           (medium
-	    :default-height 117)
-           (large
-	    :default-height 133)
-           (huge
-	    :default-height 155)
-           (t
-	    ;; Inherit the default font from the window manager.
+         `((tiny :default-height 78)
+           (small :default-height 90)
+           (regular :default-height 102)
+           (medium :default-height 117)
+           (large :default-height 133)
+           (huge :default-height 155)
+           (t ; Inherit the default font from the window manager.
 	    :default-family "Monospace"
 	    :default-height 94
             :fixed-pitch-family "Monospace"
