@@ -57,7 +57,56 @@
        (type . active-project)
        (area-of-focus . "Work"))))
 
-;; (defun ceamx/org-gtd-)
+(defun ceamx/quick-wins ()
+  "Display low-effort next actions."
+  (interactive)
+  (org-gtd-view-show
+    '( (name . "Quick Wins")
+       (type . next-action)
+       (effort . (< "15min")))))
+
+(defun ceamx/focused-work ()
+  "Display next action candidates for focused work."
+  (interactive)
+  (org-gtd-view-show
+    '( (name . "Focus Work")
+       (type . next-action)
+       (priority . (>= B))
+       (effort . (> "30min")))))
+
+(defun ceamx/triage-needs-effort ()
+  "Display next actions missing effort metadata."
+  (interactive)
+  (org-gtd-view-show
+    '( (name . "Needs Effort Estimate")
+       (type . next-action)
+       (effort . nil))))
+
+(defun ceamx/triage-needs-priority ()
+  "Display next actions missing priority metadata."
+  (interactive)
+  (org-gtd-view-show
+    '( (name . "Needs Priority")
+       (type . next-action)
+       (priority . nil))))
+
+(defun ceamx/triage-in-progress ()
+  "Display next actions that have been started but not finished.
+Uses clocked status to determine progress."
+  (interactive)
+  (org-gtd-view-show
+    '( (name . "In Progress")
+       (type . next-action)
+       (clocked . (> "0:00")))))
+
+(defun ceamx/triage-not-started ()
+  "Display next actions that have not been started.
+Uses clocked status to determine progress."
+  (interactive)
+  (org-gtd-view-show
+    '( (name . "Not Started")
+       (type . next-action)
+       (clocked . nil))))
 
 (provide 'ceamx-doing)
 ;;; ceamx-doing.el ends here
