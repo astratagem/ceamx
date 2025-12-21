@@ -637,29 +637,6 @@ ORDER can be used to deduce the feature context."
   (cursory-mode 1)
   (cursory-set-preset (or (cursory-restore-latest-preset) 'box)))
 
-;;;;; Sideline
-
-(setup (:package sideline)
-  (setq! sideline-backends-right '(sideline-eglot))
-  (setq! sideline-backends-left-skip-current-line t
-         sideline-backends-right-skip-current-line t)
-  (setq! sideline-order-left 'down
-         sideline-order-right 'up)
-  (setq! sideline-format-left "%s   "
-         sideline-format-right "   %s")
-  (setq! sideline-priority 100)
-  (setq! sideline-display-backend-name t))
-
-(setup (:package sideline-flymake)
-  (:with-feature flymake
-    (:hook sideline-mode)))
-
-(setup (:package sideline-flycheck)
-  (:with-feature flycheck
-    (:hook sideline-mode sideline-flycheck-setup)))
-
-(setup (:package sideline-eglot))
-
 ;;;;; Images
 
 (setup image-mode
@@ -1666,7 +1643,6 @@ ORDER can be used to deduce the feature context."
                     eglot-server-programs)))))
 
 ;; These are undeclared dependencies of `typst-preview':
-(setup (:package f))
 (setup (:package websocket))
 
 (setup (:package (typst-preview :host github :repo "havarddj/typst-preview.el"))
@@ -2070,6 +2046,29 @@ ORDER can be used to deduce the feature context."
 
 (setup (:package consult-eglot))
 
+;;;;; Sideline
+
+(setup (:package sideline)
+  (setq! sideline-backends-right '(sideline-eglot))
+  (setq! sideline-backends-left-skip-current-line t
+         sideline-backends-right-skip-current-line t)
+  (setq! sideline-order-left 'down
+         sideline-order-right 'up)
+  (setq! sideline-format-left "%s   "
+         sideline-format-right "   %s")
+  (setq! sideline-priority 100)
+  (setq! sideline-display-backend-name t))
+
+(setup (:package sideline-flymake)
+  (:with-feature flymake
+    (:hook sideline-mode)))
+
+(setup (:package sideline-flycheck)
+  (:with-feature flycheck
+    (:hook sideline-mode sideline-flycheck-setup)))
+
+(setup (:package sideline-eglot))
+
 ;;;;; All Lisps
 
 (setup emacs
@@ -2130,7 +2129,7 @@ ORDER can be used to deduce the feature context."
 ;;;;; JSON
 
 (setup json-ts-mode
-  (:file-match "\\.jsonc\\'"))
+  (:match-file "*.jsonc"))
 
 ;;;;; TOML
 
@@ -2907,7 +2906,9 @@ ORDER can be used to deduce the feature context."
   "s" #'org-gtd-reflect-stuck-projects
   "t" (cons "[ TRIAGE ]" (define-prefix-command 'ceamx-doing-t-prefix))
   "t e" #'ceamx/triage-needs-effort
-  "t p" #'ceamx/triage-needs-priority)
+  "t n" #'ceamx/triage-not-started
+  "t p" #'ceamx/triage-needs-priority
+  "t u" #'ceamx/triage-in-progress)
 
 (setup org-gtd
   (:when-loaded
