@@ -349,6 +349,8 @@ ORDER can be used to deduce the feature context."
 
 (setup (:package f))
 
+(setup (:package hydra))
+
 (setup (:package tmr)
   (:with-feature embark
     (:when-loaded
@@ -973,6 +975,9 @@ ORDER can be used to deduce the feature context."
 
 
 ;;;; Editing
+
+(setup ceamx-editing
+  (require 'ceamx-editing))
 
 (setup emacs
   (setq! save-interprogram-paste-before-kill t)
@@ -3135,9 +3140,14 @@ ORDER can be used to deduce the feature context."
 
 ;;;;; [C-x]
 
-(require 'ceamx-simple)
+(setup ceamx-simple
+  (require 'ceamx-simple))
+
+(setup ceamx-editing
+  (require 'ceamx-editing))
 
 (define-keymap :keymap global-map
+  "C-x SPC" #'ceamx/rectangle-dispatch/body ; orig. `rectangle-mark-mode'
   "C-x k" #'ceamx/kill-current-buffer
   "C-x K" #'kill-buffer)
 
