@@ -80,5 +80,20 @@ files               => `wdired'
          (embark-after-export-hook `(,@embark-after-export-hook ,edit-command)))
     (embark-export)))
 
+(defun ceamx-completion--embark-display-actions-responsive (buffer alist)
+  "Display Embark actions BUFFER in a side window.
+Uses right side if frame is wide, top if narrow.
+WIDTH-THRESHOLD defaults to 140 columns.
+ALIST is passed through to `display-buffer-in-side-window'."
+  (let* ((width-threshold 140)
+         (wide-p (> (frame-width) width-threshold))
+         (side (if wide-p 'right 'top))
+         (size (if wide-p
+                   '(window-width . 0.3)
+                 '(window-height . 0.3))))
+    (display-buffer-in-side-window
+     buffer
+     (append `((side . ,side) ,size (slot . 99)) alist))))
+
 (provide 'ceamx-completion)
 ;;; ceamx-completion.el ends here

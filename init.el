@@ -1509,8 +1509,7 @@ ORDER can be used to deduce the feature context."
       ))
 
   (setq! embark-verbose-indicator-display-action
-    '( (display-buffer-reuse-window display-buffer-use-some-window)
-       (inhibit-same-window . t)))
+         '(ceamx-completion--embark-display-actions-responsive))
 
   (cl-pushnew
    '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
