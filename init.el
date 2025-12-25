@@ -1507,6 +1507,11 @@ ORDER can be used to deduce the feature context."
       ;; (:hook #'embark-context-menu 100)
       (add-hook 'context-menu-functions #'embark-context-menu 100)
       ))
+
+  (setq! embark-verbose-indicator-display-action
+    '( (display-buffer-reuse-window display-buffer-use-some-window)
+       (inhibit-same-window . t)))
+
   (cl-pushnew
    '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
      nil
