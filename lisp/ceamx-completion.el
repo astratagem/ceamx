@@ -81,6 +81,14 @@ files               => `wdired'
          (embark-after-export-hook `(,@embark-after-export-hook ,edit-command)))
     (embark-export)))
 
+;;;###autoload
+(defun ceamx/match-components-literally ()
+  "Completion components match literally for the rest of the session."
+  (interactive)
+  (setq-local
+    orderless-matching-styles '(orderless-literal)
+    orderless-style-dispatchers nil))
+
 ;;;; Private Functions
 
 (defun ceamx-completion--embark-display-actions-responsive (buffer alist)

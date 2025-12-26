@@ -1283,17 +1283,21 @@ ORDER can be used to deduce the feature context."
 
 ;;;; Completion
 
-(require 'ceamx-completion)
+(setup ceamx-completion
+  (require 'ceamx-completion))
 
 (setup (:package orderless)
   (require 'orderless)
   (setq! completion-styles (append '(orderless) completion-styles))
-  (setq! completion-category-overrides
-         '((file . (styles . (partial-completion)))
-           (bookmark . (styles . (basic substring)))
-           (library . (styles . (basic substring)))
-           (imenu . (styles . (orderless substring basic)))
-           (kill-ring . (styles . (orderless))))))
+  (setq! completion-category-overrides '( (file . (styles . (partial-completion)))
+                                          (bookmark . (styles . (basic substring)))
+                                          (library . (styles . (basic substring)))
+                                          (imenu . (styles . (orderless substring basic)))
+                                          (kill-ring . (styles . (orderless)))))
+  (:with-feature ceamx-completion
+    (:with-feature minibuffer
+      (:with-map minibuffer-local-completion-map
+        (:bind "C-l" #'ceamx/match-components-literally)))))
 
 (setup (:package consult)
   (:with-feature register
