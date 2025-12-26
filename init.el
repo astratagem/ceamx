@@ -1188,6 +1188,7 @@ ORDER can be used to deduce the feature context."
   (setq! magit-save-repository-buffers nil)
   (setq! magit-process-finish-apply-ansi-colors t)
   (setq! magit-process-popup-time 3)
+  (setq! magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
   (:with-mode magit-status-mode
     (:bind "_" #'magit-revert)
     (:bind "x" #'magit-discard))
