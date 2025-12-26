@@ -24,7 +24,8 @@
 
 ;;; Code:
 
-;; via <https://github.com/minad/consult?tab=readme-ov-file#help>
+;;;; Commands
+
 ;;;###autoload
 (defun ceamx/emacs-info ()
   "Search through common Emacs info pages."
@@ -58,7 +59,7 @@
                  (_ #'consult-info))))
       (command-execute fn))))
 
-
+;;;###autoload
 (defun ceamx/embark-export-write ()
   "Export the current `vertico' candidates to a writable buffer.
 Supported export flows include the following:
@@ -79,6 +80,8 @@ files               => `wdired'
               (x (user-error "Embark category %S doesn't support writable export" x)))))
          (embark-after-export-hook `(,@embark-after-export-hook ,edit-command)))
     (embark-export)))
+
+;;;; Private Functions
 
 (defun ceamx-completion--embark-display-actions-responsive (buffer alist)
   "Display Embark actions BUFFER in a side window.
