@@ -3160,6 +3160,11 @@ ORDER can be used to deduce the feature context."
   "C-x k" #'ceamx/kill-current-buffer
   "C-x K" #'kill-buffer)
 
+;;;;; [C-x 8] :: Character Prefix (`iso-transl-ctl-x-8-map')
+
+(define-keymap :keymap global-map
+  "C-x 8 n" #'nerd-icons-insert)
+
 ;;;;; [C-x w] :: Window Prefix
 
 (define-keymap :keymap global-map
