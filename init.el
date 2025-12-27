@@ -2186,12 +2186,12 @@ ORDER can be used to deduce the feature context."
 ;;;;; KDL
 
 (setup (:package (kdl-ts-mode :host github :repo "merrickluo/kdl-ts-mode"))
-  (:file-match "\\.kdl\\'"))
+  (:match-file "*.kdl"))
 
 ;;;;; jq
 
 (setup (:package jq-mode)
-  (:file-match "\\.jq$")
+  (:match-file "*.jq")
   (:hook (lambda () (electric-pair-local-mode -1)))
   (:with-feature json-ts-mode
     (:bind ceamx-repl-key #'jq-interactively)))
@@ -2336,7 +2336,7 @@ ORDER can be used to deduce the feature context."
 ;;       :hostmode 'poly-nix-hostmode
 ;;       :innermodes '(poly-nix-dynamic-innermode))
 ;;     (:with-mode poly-nix-mode
-;;       (:file-match "\\.nix"))))
+;;       (:match-file "*.nix"))))
 
 ;;;; Notes
 
@@ -2417,7 +2417,7 @@ ORDER can be used to deduce the feature context."
 ;; Package installed via Nixpkgs due to dependencies.
 (setup pdf-tools
   (:with-mode pdf-view-mode
-    (:file-match "\\.pdf\\'")))
+    (:match-file "*.pdf")))
 
 ;;;; News
 
