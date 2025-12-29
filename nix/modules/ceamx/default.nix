@@ -34,7 +34,7 @@ in
           pkgs.taplo
         ]
         ++ (with pkgs.nodePackages; [
-          dockerfile-language-server-nodejs
+          dockerfile-language-server
           typescript-language-server
           vscode-langservers-extracted
           yaml-language-server
