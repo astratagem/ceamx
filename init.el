@@ -2761,6 +2761,15 @@ ORDER can be used to deduce the feature context."
     (:with-mode org-gtd-clarify-mode
       (:hook (lambda () (breadcrumb-local-mode -1))))))
 
+;;;; Emacs Everywhere
+
+(setup emacs-everywhere
+  ;; `emacs-everywhere' adds itself to `server-visit-hook' at load time,
+  ;; so we need to ensure it has loaded when the server is running.
+  (:with-feature server
+    (:when-loaded
+      (require 'emacs-everywhere))))
+
 ;;;; Keybindings
 
 (define-keymap :keymap global-map
