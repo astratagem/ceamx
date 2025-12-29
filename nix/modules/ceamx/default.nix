@@ -32,12 +32,12 @@ in
       let
         languageServerPkgs = [
           pkgs.bash-language-server
+          pkgs.dockerfile-language-server
           pkgs.editorconfig-core-c
           pkgs.systemd-lsp
           pkgs.taplo
         ]
         ++ (with pkgs.nodePackages; [
-          dockerfile-language-server
           typescript-language-server
           vscode-langservers-extracted
           yaml-language-server
