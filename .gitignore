@@ -2,6 +2,7 @@
 .data
 .direnv
 result
+*.elc
 
 # Context-specific configuration
 /site-config.el
