@@ -41,6 +41,27 @@
         "type": "github"
       }
     },
+    "conflake": {
+      "inputs": {
+        "nixpkgs": [
+          "nix-treesitter",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1739025932,
+        "narHash": "sha256-8BbSpXfJfy3R7XYX43dQeYZJ7K+IDCfGZb1KgRHN0Pg=",
+        "owner": "ratson",
+        "repo": "conflake",
+        "rev": "69b5b014b79ecd457aa698e383602b07d52683c4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ratson",
+        "repo": "conflake",
+        "type": "github"
+      }
+    },
     "devshell": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -171,6 +192,27 @@
         "type": "github"
       }
     },
+    "nix-treesitter": {
+      "inputs": {
+        "conflake": "conflake",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1739028560,
+        "narHash": "sha256-7joUNhdZfSkuGL65Lbsmuf/NviUjuGtAhbfdPYuFGjk=",
+        "owner": "ratson",
+        "repo": "nix-treesitter",
+        "rev": "d9d35e37a5b2aee2f3f4d14c66e2bf0604dae4ce",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ratson",
+        "repo": "nix-treesitter",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1704161960,
@@ -290,6 +332,7 @@
         "devshell": "devshell_2",
         "flake-parts": "flake-parts_2",
         "nix-nil-lsp": "nix-nil-lsp",
+        "nix-treesitter": "nix-treesitter",
         "nixpkgs": "nixpkgs_5"
       }
     },

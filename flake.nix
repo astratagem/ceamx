@@ -1,11 +1,15 @@
 {
   description = "ceamx: an emacs config";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.flake-parts.url = "github:hercules-ci/flake-parts";
-  inputs.apparat.url = "sourcehut:~montchr/apparat";
-  inputs.devshell.url = "github:numtide/devshell";
-  inputs.nix-nil-lsp.url = "github:oxalica/nil";
+  inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    apparat.url = "sourcehut:~montchr/apparat";
+    devshell.url = "github:numtide/devshell";
+    nix-nil-lsp.url = "github:oxalica/nil";
+    nix-treesitter.url = "github:ratson/nix-treesitter";
+    nix-treesitter.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  };
 
   outputs =
     inputs@{ flake-parts, nixpkgs, ... }:

@@ -1,4 +1,12 @@
-{ moduleWithSystem, inputs, ... }:
+{
+  flake-parts-lib,
+  moduleWithSystem,
+  inputs,
+  ...
+}:
+let
+  inherit (flake-parts-lib) importApply;
+in
 {
   imports = [ inputs.flake-parts.flakeModules.modules ];
 
@@ -6,7 +14,11 @@
     _perSystem@{ inputs', config, ... }:
     home@{ lib, ... }:
     {
-      imports = [ ./ceamx/default.nix ];
+      imports = [
+        (importApply ./ceamx/default.nix {
+          inherit (inputs'.nix-treesitter.packages) tree-sitter-corn;
+        })
+      ];
 
       config = lib.mkIf home.config.programs.emacs.ceamx.enable {
         home.packages = [
