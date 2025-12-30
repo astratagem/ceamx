@@ -429,6 +429,22 @@ ORDER can be used to deduce the feature context."
   (setq! custom-safe-themes t)
   (setq! custom-theme-allow-multiple-selections nil))
 
+;;;;;; Modus Themes
+;; NOTE: Must be first - other Prot themes depend on `modus-themes-declare' macro.
+
+(setup (:package modus-themes)
+  (require 'modus-themes)
+  (ceamx-ui-define-preferred-themes 'modus 'modus-vivendi 'modus-operandi)
+  (setq! modus-themes-to-toggle (ceamx-ui-theme-family-preferred-themes 'modus))
+  (setq! modus-themes-bold-constructs t
+         modus-themes-italic-constructs t
+         modus-themes-mixed-fonts t
+         modus-themes-variable-pitch-ui t)
+  (setq! modus-themes-prompts '(italic bold))
+  (setq! modus-themes-completions
+         '((matches . (extrabold underline))
+           (selection . (semibold italic)))))
+
 ;;;;;; Standard Themes
 
 (setup (:package standard-themes)
@@ -454,21 +470,6 @@ ORDER can be used to deduce the feature context."
       (setq! doric-themes-to-toggle
              (ceamx-ui-theme-family-preferred-themes 'doric)))))
 
-;;;;;; Modus Themes
-
-(setup (:package modus-themes)
-  (require 'modus-themes)
-  (ceamx-ui-define-preferred-themes 'modus 'modus-vivendi 'modus-operandi)
-  (setq! modus-themes-to-toggle (ceamx-ui-theme-family-preferred-themes 'modus))
-  (setq! modus-themes-bold-constructs t
-         modus-themes-italic-constructs t
-         modus-themes-mixed-fonts t
-         modus-themes-variable-pitch-ui t)
-  (setq! modus-themes-prompts '(italic bold))
-  (setq! modus-themes-completions
-         '((matches . (extrabold underline))
-           (selection . (semibold italic)))))
-
 ;;;;;; Ef Themes
 
 (setup (:package ef-themes)
@@ -479,6 +480,8 @@ ORDER can be used to deduce the feature context."
          ef-themes-variable-pitch-ui t))
 
 ;;;;;; Load the preferred theme
+
+(elpaca-wait)
 
 (setup ceamx-ui
   (setq! ceamx-ui-theme-family 'doric)

@@ -116,28 +116,28 @@
 (defun ceamx-ui-dark-themes-list ()
   "Return a list of known dark themes."
   (append
-    (when (locate-library "modus-themes")
+    (when (featurep 'modus-themes)
       (ceamx-ui--filter-symbols-by-prefix
         "modus-vivendi" modus-themes-items))
-    (when (locate-library "doric-themes")
+    (when (featurep 'doric-themes)
       doric-themes-dark-themes)
-    (when (locate-library "ef-themes")
+    (when (featurep 'ef-themes)
       ef-themes-dark-themes)
-    (when (locate-library "standard-themes")
+    (when (featurep 'standard-themes)
       (ceamx-ui--filter-symbols-by-prefix
         "standard-light" standard-themes-items))))
 
 (defun ceamx-ui-light-themes-list ()
   "Return a list of known light themes."
   (append
-    (when (locate-library "modus-themes")
+    (when (featurep 'modus-themes)
       (ceamx-ui--filter-symbols-by-prefix
         "modus-operandi" modus-themes-items))
-    (when (locate-library "doric-themes")
+    (when (featurep 'doric-themes)
       doric-themes-light-themes)
-    (when (locate-library "ef-themes")
+    (when (featurep 'ef-themes)
       ef-themes-light-themes)
-    (when (locate-library "standard-themes")
+    (when (featurep 'standard-themes)
       (ceamx-ui--filter-symbols-by-prefix
         "standard-dark" standard-themes-items))))
 
