@@ -1102,6 +1102,14 @@ ORDER can be used to deduce the feature context."
 
 ;;;; Version Control
 
+(setup ceamx-vcs
+  (require 'ceamx-vcs))
+
+(setup (:package browse-at-remote)
+  (:when-loaded
+    (cl-pushnew '(:host "^codeberg\\.org$" :type "codeberg")
+      browse-at-remote-remote-type-regexps)))
+
 ;;;;; `vc-mode'
 
 (setup vc
