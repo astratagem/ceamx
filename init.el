@@ -2331,6 +2331,11 @@ ORDER can be used to deduce the feature context."
 
 (setup (:package yuck-mode))
 
+;;;;; Corn
+
+(setup (:package (corn-ts-mode :host github :repo "astratagem/corn-ts-mode"))
+  (setq! corn-ts-mode-indent-offset 4))
+
 ;;;;; Polymode
 
 ;; (setup (:package polymode)
