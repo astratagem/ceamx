@@ -12,7 +12,7 @@
          "https://github.com/progfolio/auto-tangle-mode.el")
        (combobulate :url "https://github.com/mickeynp/combobulate")))
  '(safe-local-variable-values
-    '((checkdoc-package-keywords-flag)
+    '((just-indent-offset . 4) (checkdoc-package-keywords-flag)
        (eval add-hook 'after-save-hook #'org-gfm-export-to-markdown t t)
        (jinx-dir-local-words . "configurated")
        (org-refile-targets (nil :maxlevel . 6))
