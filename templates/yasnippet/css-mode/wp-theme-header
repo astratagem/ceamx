@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: WordPress theme metadata header
+# key: wp-theme-header
+# contributor: astratagem <chmont@protonmail.com>
+# group: wordpress
+# --
+/*
+Theme Name:        ${1:Theme Name}
+Theme URI:         ${2:https://example.com/theme}
+Author:            ${3:Author Name}
+Author URI:        ${4:https://example.com}
+Description:       ${5:Theme description.}
+Version:           ${6:1.0.0}
+Requires at least: ${7:6.0}
+Tested up to:      ${8:6.7}
+Requires PHP:      ${9:8.0}
+License:           ${10:GPL-2.0-or-later}
+License URI:       ${11:https://www.gnu.org/licenses/gpl-2.0.html}
+Text Domain:       ${12:theme-slug}
+Tags:              ${13:block-patterns, custom-colors, full-site-editing}
+*/
+
+$0
