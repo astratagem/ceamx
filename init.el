@@ -1189,8 +1189,7 @@ ORDER can be used to deduce the feature context."
 
 (setup (:package git-timemachine))
 
-(setup (:package (git-commit :host github :repo "magit/magit" :files ("lisp/git-commit.el")))
-  (setq! git-commit-major-mode #'markdown-mode))
+(setup (:package (git-commit :host github :repo "magit/magit" :files ("lisp/git-commit.el"))))
 
 ;;;;; Magit
 
