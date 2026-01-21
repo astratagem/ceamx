@@ -765,8 +765,7 @@ ORDER can be used to deduce the feature context."
 ;;;;; Window management
 
 (setup (:package golden-ratio)
-  (setq! golden-ratio-auto-scale t)
-  (golden-ratio-mode))
+  (setq! golden-ratio-auto-scale t))
 
 (setup (:package ace-window)
   (setq! aw-scope 'visible)
@@ -3113,6 +3112,7 @@ ORDER can be used to deduce the feature context."
   "M" #'menu-bar-mode
   "o" #'outline-minor-mode
   "p" nil                               ; RESERVED: for "previews"
+  "r" #'golden-ratio-mode
   "s" #'jinx-mode
   "t" #'typo-mode
   "T" #'tab-bar-mode
