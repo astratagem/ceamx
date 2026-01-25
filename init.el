@@ -3190,6 +3190,11 @@ ORDER can be used to deduce the feature context."
 (define-keymap :keymap global-map
   "C-x 8 n" #'nerd-icons-insert)
 
+;;;;; [C-x v] :: Version Control Prefix
+
+(define-keymap :keymap global-map
+  "C-x v t" #'git-timemachine)
+
 ;;;;; [C-x w] :: Window Prefix
 
 (define-keymap :keymap global-map
