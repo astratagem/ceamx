@@ -21,6 +21,8 @@
         org-protocol-desktop-entry = pkgs.callPackage ./by-name/org-protocol-desktop-entry.nix {
           mimeTypes = [ self.lib.mimetypes.org-protocol ];
         };
+
+        rassumfrassum = pkgs.callPackage ./by-name/rassumfrassum/package.nix { };
       };
     };
 }

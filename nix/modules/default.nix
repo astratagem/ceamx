@@ -11,7 +11,7 @@ in
   imports = [ inputs.flake-parts.flakeModules.modules ];
 
   flake.modules.homeManager.ceamx = moduleWithSystem (
-    _perSystem@{ inputs', config, ... }:
+    perSystem@{ inputs', config, ... }:
     home@{ lib, ... }:
     {
       imports = [
@@ -22,7 +22,9 @@ in
 
       config = lib.mkIf home.config.programs.emacs.ceamx.enable {
         home.packages = [
-          config.packages.aspell-with-dicts
+          perSystem.config.packages.aspell-with-dicts
+          perSystem.config.packages.rassumfrassum
+
           inputs'.nix-nil-lsp.packages.nil
         ];
 
