@@ -59,18 +59,21 @@
 
 ;;;;; Commands
 
-(defun ceamx-auth/lookup (host user &optional port)
+(defun ceamx-auth/lookup (entry &optional field)
+  "Get the value of a password-store item at path ENTRY.
+ENTRY is the path within the password store (e.g. \"irc/libera/nick\").
+FIELD should be a string or keyword naming the field (e.g. \"irc-key\"
+or `:irc-key'), or nil for the password (first line).  The special
+values `secret' and `:secret' also retrieve the password."
   (interactive)
-  (require 'auth-source)
   (require 'auth-source-pass)
-  (let ((auth (auth-source-search :host host :user user :port port)))
-    (if auth
-        (let ((secretf (plist-get (car auth) :secret)))
-          (if secretf
-              (funcall secretf)
-            (error "Auth entry for %s@%s:%s has no secret!"
-                   user host port)))
-      (error "No auth entry found for %s@%s:%s" user host port))))
+  (let* ((key (pcase field
+                ((or 'nil 'secret :secret) 'secret)
+                ((pred keywordp) (substring (symbol-name field) 1))
+                (_ field)))
+         (value (auth-source-pass-get key entry)))
+    (or value
+      (error "Auth entry `%s' has no field `%s'!" entry key))))
 
 (provide 'ceamx-auth)
 ;;; ceamx-auth.el ends here

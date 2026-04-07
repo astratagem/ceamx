@@ -24,6 +24,11 @@
 
 ;;; Code:
 
+(defun ceamx/capture-inbox ()
+  (interactive)
+  (call-interactively #'org-store-link)
+  (org-capture nil "i"))
+
 ;;;; Org-GTD
 
 ;; - List of available filters :: https://github.com/Trevoke/org-gtd.el/blob/org-gtd-4/doc/org-gtd.org#available-filters

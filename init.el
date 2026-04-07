@@ -71,6 +71,12 @@
   :type 'file
   :group 'ceamx)
 
+(defcustom ceamx-default-inbox-file
+  (expand-file-name "inbox.org" ceamx-agenda-dir)
+  "Absolute path to default Something-Doing inbox file."
+  :type 'file
+  :group 'ceamx)
+
 (defcustom ceamx-outline-search-max-level 5
   "Maximum level to search in outlines."
   :type 'number
@@ -493,7 +499,6 @@ ORDER can be used to deduce the feature context."
   (setq-default text-scale-remap-header-line t))
 
 (setup (:package fontaine)
-  (:only-if (display-graphic-p))
   (require 'fontaine)
   (setq! fontaine-latest-state-file
          (expand-file-name "fontaine-latest-state.eld" ceamx-storage-dir))
@@ -525,23 +530,25 @@ ORDER can be used to deduce the feature context."
             :tab-bar-height 0.8
             :tab-line-family "Berkeley Mono"
             :tab-line-height 0.8
-	    :line-spacing 0.01)))
-  (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))
-  (fontaine-mode 1))
+	     :line-spacing 0.01)))
+  (when (display-graphic-p)
+    (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))
+    (fontaine-mode 1)))
 
 (setup (:package ligature)
-  (:only-if (display-graphic-p))
   (:with-feature fontaine
     (:when-loaded
-      (global-ligature-mode 1)))
+      (when (display-graphic-p)
+        (global-ligature-mode 1))))
   (:when-loaded
-    (ligature-set-ligatures
-     'prog-mode
-     '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->"
-       "<---->" "<!--" "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">="
-       "<=>" "<==>" "<===>" "<====>" "<!---" "<~~" "<~" "~>" "~~>"
-       "::" ":::" "==" "!=" "===" "!==" ":=" ":-" ":+" "<*" "<*>"
-       "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))))
+    (when (display-graphic-p)
+      (ligature-set-ligatures
+        'prog-mode
+        '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->"
+           "<---->" "<!--" "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">="
+           "<=>" "<==>" "<===>" "<====>" "<!---" "<~~" "<~" "~>" "~~>"
+           "::" ":::" "==" "!=" "===" "!==" ":=" ":-" ":+" "<*" "<*>"
+           "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++")))))
 
 (setup (:package show-font)
   (:only-if (display-graphic-p))
@@ -1755,7 +1762,8 @@ ORDER can be used to deduce the feature context."
 ;;;; Org-Mode
 
 (setq! ceamx-default-agenda-files
-       (list (file-name-concat ceamx-agenda-dir "todo.org")
+       (list (file-name-concat ceamx-agenda-dir "inbox.org")
+             (file-name-concat ceamx-agenda-dir "todo.org")
              (file-name-concat ceamx-agenda-dir "work.org")))
 
 (setup org
@@ -2660,7 +2668,62 @@ ORDER can be used to deduce the feature context."
 
 ;;;; Apps
 
-;;;;; Mastodon
+(setup (:package circe)
+  (setq! circe-default-nick "syadasti"
+    circe-default-user circe-default-nick
+    circe-default-realname circe-default-nick)
+
+  (defun ceamx--circe-redacted-drone-auth ()
+    "Authenticate with Drone bot on Redacted IRC."
+    (when (string-match-p "scratch-network" (buffer-name))
+      (let ((irc-key (ceamx-auth/lookup "irc.scratch-network.net/syadasti" :irc-key)))
+        (circe-command-MSG "Drone"
+          (format "enter #redacted syadasti %s" irc-key)))))
+  (add-hook 'circe-server-connected-hook #'ceamx--circe-redacted-drone-auth)
+
+  (defun ceamx--circe-ptp-hummingbird-auth ()
+    "Authenticate with Hummingbird bot on PTP IRC."
+    (when (string-match-p "passthepopcorn" (buffer-name))
+      (let ((irc-key (ceamx-auth/lookup "irc.passthepopcorn.me/syadasti" :irc-key)))
+        (circe-command-MSG "Hummingbird"
+          (format "enter syadasti %s #PassThePopcorn" irc-key)))))
+  (add-hook 'circe-server-connected-hook #'ceamx--circe-ptp-hummingbird-auth)
+
+  (defun ceamx--circe-p2p-net-auth ()
+    "Authenticate on the P2P-NET IRC network."
+    (when (string-match-p "p2p-network" (buffer-name))
+      (let ((irc-key (ceamx-auth/lookup "irc.p2p-network.net/cromonna" :irc-key)))
+        ;; (circe-command-MSG "Hummingbird"
+        ;;   (format "enter syadasti %s #PassThePopcorn" irc-key))
+        )))
+  ;; (add-hook 'circe-server-connected-hook #'ceamx--circe-ptp-hummingbird-auth)
+
+  (setq! circe-network-options
+    '( ( "Libera Chat"
+         :use-tls t
+         :nick "astratagem"
+         :user "astratagem"
+         :realname "astratagem"
+         :sasl-password (lambda (_) (ceamx-auth/lookup "libera.chat/astratagem"))
+         :channels ("#emacs" "#emacs-circe"))
+
+       ( "RED"
+         :host "irc.scratch-network.net"
+         :port 6697
+         :use-tls t
+         :nickserv-password (lambda (_) (ceamx-auth/lookup "irc.scratch-network.net/syadasti")))
+
+       ( "PTP"
+         :host "irc.passthepopcorn.me"
+         :use-tls t
+         :port 6697
+         :nickserv-password (lambda (_) (ceamx-auth/lookup "irc.passthepopcorn.me/syadasti")))
+
+       ( "P2P-NET"
+         :host "irc.p2p-network.net"
+         :use-tls t
+         :port 6697
+         :nickserv-password (lambda (_) (ceamx-auth/lookup "irc.p2p-network.net/syadasti"))))))
 
 (setup (:package mastodon)
   (setq! mastodon-instance-url "https://assemblag.es"
@@ -2717,11 +2780,9 @@ ORDER can be used to deduce the feature context."
   (require 'org-capture)
   (setq! org-capture-templates
          (doct
-
           `(("Inbox item" :keys "i"
-             :file ceamx-default-todo-file
-             :headline "Inbox"
-             :template ("* TODO %?"
+             :file ceamx-default-inbox-file
+             :template ("* TODO %?\n"
                         "%i %a")
              :icon ("checklist" :set "octicon" :color "green"))
 
@@ -2731,50 +2792,6 @@ ORDER can be used to deduce the feature context."
              :kill-buffer t
              :empty-lines 1)))))
 
-
-;;;;; Org-GTD
-
-(setup (:package (org-gtd :host github
-                          :repo "Trevoke/org-gtd.el"
-                          :branch "org-gtd-4"))
-
-  (setq! org-gtd-directory (file-name-concat ceamx-notes-dir "org-gtd/"))
-
-  ;; This acknowledgement must be declared before the package loads.
-  (setq org-gtd-update-ack "4.0.0")
-
-  (setq! org-gtd-keyword-mapping '((todo . "TODO")
-                                   (next . "NEXT")
-                                   (wait . "WAIT")
-                                   ;; TODO: notify upstream that this
-                                   ;; required cell was not included in
-                                   ;; the setup example.
-                                   (done . "DONE")
-                                   (canceled . "CNCL")))
-  (:when-loaded
-    ;; REQUIRED for Org-GTD
-    (org-edna-mode 1))
-
-  (:with-feature org
-    (cl-pushnew org-gtd-directory org-agenda-files)
-    (setq! org-todo-keywords '((sequence
-                                "TODO(t)"
-                                "NEXT"
-                                "WAIT"
-                                "|"
-                                "DONE(d!)"
-                                "CNCL"))))
-
-  (:with-feature breadcrumb
-    ;; HACK: Possible workaround for random errors.
-    ;;
-    ;; > it looks like the above error might be a conflict between
-    ;; > breadcrumb-mode and the way [the developer is] using the
-    ;; > header-line-format.
-    ;;
-    ;; https://discordapp.com/channels/1071624232246706186/1451952177391210497/1451956630617849906
-    (:with-mode org-gtd-clarify-mode
-      (:hook (lambda () (breadcrumb-local-mode -1))))))
 
 ;;;; Emacs Everywhere
 
