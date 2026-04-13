@@ -1622,16 +1622,8 @@ ORDER can be used to deduce the feature context."
             (unless (derived-mode-p ceamx-text-mode-derived-prog-modes)
               (variable-pitch-mode 1))))
 
-(setup (:package typo)
-  (:with-hook text-mode-hook
-    (:hook
-     (defun ceamx+typo-mode-maybe-enable-h ()
-       (let ((excluded-modes (append ceamx-text-mode-derived-prog-modes
-                                     ceamx-typo-mode-excluded-modes)))
-         (unless (derived-mode-p excluded-modes)
-           (typo-mode 1)))))))
-
 ;; Install with system package manager due to dependencies.
+;; FIXME: sometimes ispell takes over...
 (setup jinx
   (:with-mode global-jinx-mode
     (:hook-into elpaca-after-init-hook))
