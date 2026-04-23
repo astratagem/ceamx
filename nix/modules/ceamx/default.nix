@@ -36,12 +36,10 @@ in
           pkgs.editorconfig-core-c
           pkgs.systemd-lsp
           pkgs.taplo
-        ]
-        ++ (with pkgs.nodePackages; [
-          typescript-language-server
-          vscode-langservers-extracted
-          yaml-language-server
-        ]);
+          pkgs.typescript-language-server
+          pkgs.vscode-langservers-extracted
+          pkgs.yaml-language-server
+        ];
 
         writingHelpers = [
           enchant
