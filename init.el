@@ -1805,7 +1805,16 @@ ORDER can be used to deduce the feature context."
 
 (setup org
   (setq! org-enforce-todo-dependencies t
-         org-enforce-todo-checkbox-dependencies t)
+    org-enforce-todo-checkbox-dependencies t)
+  (setq! org-todo-keywords
+         '((sequence
+             "TODO(t)"
+             "INPRG(i@/!)"
+             "BLOCKED(b@)"
+             "HOLD(h@)"
+             "|"
+             "DONE(d!)"
+             "CANCELLED(x@/!)")))
   (setq! org-clock-in-switch-to-state "INPRG"))
 
 ;;;;; Org-Mode: Logbook
