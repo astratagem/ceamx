@@ -1,6 +1,5 @@
 {
   emacs-overlay,
-  tree-sitter-corn,
 }:
 {
   config,
@@ -29,8 +28,6 @@ in
       #      epkgs.ready-player
       epkgs.treesit-grammars.with-all-grammars
       epkgs.treesit-auto
-
-      tree-sitter-corn
     ];
 
     home.packages =

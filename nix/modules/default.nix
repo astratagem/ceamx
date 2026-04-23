@@ -17,7 +17,6 @@ in
       imports = [
         (importApply ./ceamx/default.nix {
           inherit (inputs) emacs-overlay;
-          inherit (inputs'.nix-treesitter.packages) tree-sitter-corn;
         })
       ];
 
