@@ -1350,11 +1350,9 @@ ORDER can be used to deduce the feature context."
   (setq! consult-narrow-key "<")
   (setq! consult-preview-key 'any)
   (consult-customize
-   consult-theme consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
-   :preview-key '(:debounce 0.4 any)))
+    consult-theme consult-ripgrep consult-git-grep consult-grep
+    consult-bookmark consult-recent-file consult-xref
+    :preview-key '(:debounce 0.4 any)))
 
 (setup (:package vertico)
   (:with-hook rfn-eshadow-update-overlay-hook
