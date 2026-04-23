@@ -6,8 +6,8 @@
     apparat.url = "sourcehut:~montchr/apparat";
     devshell.url = "github:numtide/devshell";
     nix-nil-lsp.url = "github:oxalica/nil";
-    nix-treesitter.url = "github:ratson/nix-treesitter";
-    nix-treesitter.inputs.nixpkgs.follows = "nixpkgs";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 

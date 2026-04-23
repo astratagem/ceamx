@@ -1,4 +1,7 @@
-{ tree-sitter-corn }:
+{
+  emacs-overlay,
+  tree-sitter-corn,
+}:
 {
   config,
   pkgs,
@@ -17,6 +20,8 @@ in
   };
 
   config = lib.mkIf isEnabled {
+    nixpkgs.overlays = [ emacs-overlay.overlays.default ];
+
     programs.emacs.extraPackages = epkgs: [
       (epkgs.jinx.override { enchant2 = enchant; })
       epkgs.pdf-tools
